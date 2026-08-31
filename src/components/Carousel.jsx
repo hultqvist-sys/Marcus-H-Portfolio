@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { SLIDE_ASPECT, carouselSlides } from '../data/carousel'
+import { PANEL_BLEED } from '../styles/panels'
 
 const EASE = [0.22, 1, 0.36, 1]
 
@@ -94,7 +95,7 @@ export default function Carousel({ slides = carouselSlides }) {
 
   return (
     <div
-      className="group relative w-full rounded-2xl overflow-hidden bg-carousel-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1558BC]"
+      className={`${PANEL_BLEED} group relative overflow-hidden bg-carousel-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1558BC]`}
       style={{ aspectRatio: SLIDE_ASPECT }}
       onKeyDown={handleKeyDown}
       tabIndex={0}

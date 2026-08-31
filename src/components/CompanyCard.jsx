@@ -4,10 +4,20 @@ import { Plus } from 'lucide-react'
 const EASE = [0.22, 1, 0.36, 1]
 const BORDER = '0.5px solid'
 
+/**
+ * Stacked (mobile) cards have no row width to redistribute, so the open card
+ * grows downwards instead — it doubles in height while its siblings hold the
+ * collapsed one. Mirrors the min-h-[220px] baseline in the card's classes,
+ * which is what carries the collapsed height before the row is measured.
+ */
+const STACKED_HEIGHT = 220
+const STACKED_EXPANDED_HEIGHT = STACKED_HEIGHT * 2
+
 export default function CompanyCard({
   company,
   isActive,
   // Row geometry comes from Companies — see the constants there.
+  isStacked,
   expandedGrow,
   expandedContentWidth,
   onActivate,
@@ -24,6 +34,24 @@ export default function CompanyCard({
     placeholderColor,
   } = company
 
+  /**
+   * Only keyboard focus should open the card. A tap focuses the element too
+   * (it's tabbable), and that focus lands before the click — so a bare
+   * onActivate here would open the card and the click would immediately toggle
+   * it shut again, costing touch users a second tap to open. Hover is safe to
+   * leave alone: framer-motion drops touch pointers from its hover gesture.
+   */
+  const handleFocus = event => {
+    let isFocusVisible = true
+    try {
+      isFocusVisible = event.currentTarget.matches(':focus-visible')
+    } catch {
+      // No :focus-visible support means the browser rings every focus anyway,
+      // so match that and activate.
+    }
+    if (isFocusVisible) onActivate()
+  }
+
   return (
     <motion.div
       className="relative overflow-hidden rounded-lg cursor-pointer flex flex-col justify-end gap-4 p-4 min-h-[220px] lg:min-h-0 basis-auto lg:basis-0 min-w-0"
@@ -31,12 +59,19 @@ export default function CompanyCard({
         // Transparent rather than none when active, so the box doesn't shift.
         border: `${BORDER} ${isActive ? 'transparent' : 'rgba(11, 18, 14, 0.14)'}`,
       }}
-      animate={{ flexGrow: isActive ? expandedGrow : 1 }}
+      animate={
+        isStacked
+          ? { height: isActive ? STACKED_EXPANDED_HEIGHT : STACKED_HEIGHT }
+          : // height back to auto so a card that was expanded while stacked
+            // doesn't carry an inline height across the breakpoint, where the
+            // row's own height should size it.
+            { flexGrow: isActive ? expandedGrow : 1, height: 'auto' }
+      }
       transition={{ duration: 0.5, ease: EASE }}
       onHoverStart={onActivate}
       onHoverEnd={onDeactivate}
       onClick={onToggle}
-      onFocus={onActivate}
+      onFocus={handleFocus}
       onBlur={onDeactivate}
       tabIndex={0}
       role="button"

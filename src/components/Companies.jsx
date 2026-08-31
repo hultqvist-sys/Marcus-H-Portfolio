@@ -35,6 +35,7 @@ const sectionVariants = {
 export default function Companies() {
   const [activeIndex, setActiveIndex] = useState(null)
   const [expandedContentWidth, setExpandedContentWidth] = useState(null)
+  const [isStacked, setIsStacked] = useState(false)
   const rowRef = useRef(null)
 
   /**
@@ -48,9 +49,12 @@ export default function Companies() {
 
     const measure = () => {
       // Below lg the row stacks and cards are already full width, so there's
-      // nothing to pre-size. Reading the computed direction keeps this in sync
-      // with the Tailwind breakpoint rather than duplicating it here.
-      if (getComputedStyle(row).flexDirection === 'column') {
+      // nothing to pre-size — the open card grows in height instead. Reading
+      // the computed direction keeps this in sync with the Tailwind breakpoint
+      // rather than duplicating it here.
+      const stacked = getComputedStyle(row).flexDirection === 'column'
+      setIsStacked(stacked)
+      if (stacked) {
         setExpandedContentWidth(null)
         return
       }
@@ -113,6 +117,7 @@ export default function Companies() {
               key={company.id}
               company={company}
               isActive={activeIndex === index}
+              isStacked={isStacked}
               expandedGrow={EXPANDED_GROW}
               expandedContentWidth={expandedContentWidth}
               onActivate={() => setActiveIndex(index)}

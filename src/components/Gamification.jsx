@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import LazyVideo from './LazyVideo'
 import SectionHeading from './SectionHeading'
+import { PANEL_BLEED } from '../styles/panels'
 
 // Figma 315:37048 — fills the grid, 614.6 tall, with a deep single-direction drop.
 const VIDEO_SHADOW = '0px 52px 52px -16px rgba(0, 0, 0, 0.24)'
@@ -19,7 +20,7 @@ export default function Gamification() {
       {/* Eases up into place as the section is reached; the video itself starts
           as soon as it mounts, which LazyVideo defers until it's in view. */}
       <motion.div
-        className="w-full rounded-2xl overflow-hidden aspect-[1104/614.6]"
+        className={`${PANEL_BLEED} overflow-hidden aspect-[1104/614.6]`}
         style={{ boxShadow: VIDEO_SHADOW }}
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}

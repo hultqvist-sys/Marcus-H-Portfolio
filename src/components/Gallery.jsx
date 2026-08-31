@@ -3,12 +3,6 @@ import { motion } from 'framer-motion'
 import Lightbox from './Lightbox'
 import { TILE_ASPECT, galleryImages } from '../data/gallery'
 
-// Deviates from Figma (which was three 346.28 columns, 32.58 apart, with 49.92
-// between groups): four columns on the same 1104 measure with a uniform 20px
-// gutter, so tiles land at 261px square. The column count itself is a literal
-// class on the grid below — see the note there.
-const COLUMN_GAP = '20px'
-
 /**
  * Tiles lift and scale ~10% on hover. `z-10` is load-bearing: without it a
  * scaled tile is painted under its later siblings and the growth gets clipped.
@@ -46,12 +40,16 @@ export default function Gallery() {
       {/* One continuous grid over every image in company order — groups share
           rows rather than each starting a fresh one, so there are no ragged
           trailing gaps. Company is still conveyed by each tile's alt text.
-          Two columns until md, where four would be ~133px each. */}
+          Two columns until md, where four would be ~133px each.
+
+          Deviates from Figma (three 346.28 columns, 32.58 apart, with 49.92
+          between groups): four columns on the same 1104 measure with a uniform
+          20px gutter, so tiles land at 261px square. 12px on a phone, where
+          20px between 164px tiles reads as too loose. */}
       <div
-        // Literal class on purpose: Tailwind generates utilities by scanning
-        // source text, so an interpolated column count is never emitted.
-        className="w-full grid grid-cols-2 md:grid-cols-4"
-        style={{ gap: COLUMN_GAP }}
+        // Literal classes on purpose: Tailwind generates utilities by scanning
+        // source text, so an interpolated column count or gap is never emitted.
+        className="w-full grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-5"
       >
         {galleryImages.map((image, index) => (
           <button

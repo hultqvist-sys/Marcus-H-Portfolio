@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion'
 import RevealVideo from './RevealVideo'
 import SectionHeading from './SectionHeading'
+import { PANEL_BLEED } from '../styles/panels'
 
 // Each animated asset carries its own background, so the panel aspect comes
 // straight from the source file rather than from a wrapper we guess at.
 //   Mix and match 2.mp4           1610 x 1196   (matches Figma 296:10513)
 //   Designed for all devices.mp4  1610 x 880    (matches Figma 297:10323)
 //   Component_board2.mp4          2000 x 1490   (padded; panel crops to 1104x742)
-const PANEL = 'w-full rounded-2xl overflow-hidden bg-panel-warm'
+const PANEL = `${PANEL_BLEED} overflow-hidden bg-panel-warm`
 
 // The component board panel is #F5EEE5, a shade off the other two.
-const PANEL_ALT = 'w-full rounded-2xl overflow-hidden bg-panel-warm-alt'
+const PANEL_ALT = `${PANEL_BLEED} overflow-hidden bg-panel-warm-alt`
 
 // Captions are held to a 824px measure for readability rather than running the
 // full 1104 grid, then centred in it — mx-auto centres the block, text-center
@@ -25,9 +26,18 @@ const fadeUp = {
   transition: { duration: 0.6, ease: 'easeOut' },
 }
 
+/**
+ * The rhythm between this section's four blocks — intro, then the three
+ * animated case-study blocks. Owned here rather than inherited from HomePage's
+ * page gap (which is the same 160px): it keeps the section a single element, so
+ * the intro can tuck up under its divider, and it makes the spacing between the
+ * animated blocks adjustable without touching the rest of the page.
+ */
+const BLOCK_RHYTHM = 'w-full flex flex-col gap-20'
+
 export default function LearningHighlights() {
   return (
-    <>
+    <div className={BLOCK_RHYTHM}>
       {/* Section intro */}
       <motion.div className="w-full flex flex-col gap-4" {...fadeUp}>
         <h2 className="font-display font-normal text-h1 text-black">
@@ -52,10 +62,15 @@ export default function LearningHighlights() {
 
         {/* 1610x1196 is the source's own size — a 1.46x upscale on a 1104
             panel, so it holds up on retina where the 1104-wide first cut went
-            soft. */}
+            soft.
+
+            mt-14 on top of the section's gap-6 puts 80px between this panel and
+            the case-study copy above it — the only gap in the section that
+            isn't the standard 24px, since it follows two paragraphs rather than
+            a caption. */}
         <RevealVideo
           src="/assets/video/Mix and match 2.mp4"
-          className={`${PANEL} aspect-[1610/1196]`}
+          className={`${PANEL} aspect-[1610/1196] mt-14`}
           ariaLabel="Learning designers assembling a page from pre-built components"
         />
 
@@ -108,6 +123,6 @@ export default function LearningHighlights() {
           components.
         </p>
       </section>
-    </>
+    </div>
   )
 }
