@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Chivo:wght@400;600;700;900&family=Sora:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Several sections ease in from the side (About's ±48px, the carousel's ±48px
+     slide transitions). At narrow widths that start position sits outside the
+     page, which would otherwise add a horizontal scrollbar for the duration of
+     the animation. Clipping on html/body propagates to the viewport instead of
+     creating a new scroll container, so it doesn't disturb the scroll-linked
+     animations the way overflow-x on an inner wrapper would. */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply font-body;
+    min-height: 100vh;
+    background: linear-gradient(171deg, #FCFAF8 1.51%, #F9F6F0 96.74%);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
