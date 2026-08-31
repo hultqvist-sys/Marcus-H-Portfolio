@@ -40,7 +40,11 @@ const fromBelowVariants = {
 
 export default function Cover() {
   return (
-    <section className="w-full min-h-screen flex flex-col items-center justify-center">
+    // On a phone the cover's content is taller than the viewport, so
+    // justify-center has no slack left to give and the logo ends up hard against
+    // the top edge. 48px of breathing room there, dropped from md up where the
+    // section is genuinely centred.
+    <section className="w-full min-h-screen flex flex-col items-center justify-center pt-12 md:pt-0">
       <motion.div
         className="w-full flex flex-col items-center gap-20"
         variants={containerVariants}

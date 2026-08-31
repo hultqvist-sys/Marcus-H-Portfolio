@@ -10,6 +10,7 @@
     "thumbs": "./scripts/gen-thumbs.sh"
   },
   "dependencies": {
+    "@vercel/functions": "^3.9.5",
     "framer-motion": "^10.16.0",
     "lucide-react": "^0.292.0",
     "react": "^18.2.0",

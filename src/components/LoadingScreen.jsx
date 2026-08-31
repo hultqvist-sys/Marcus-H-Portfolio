@@ -14,6 +14,12 @@ const HOLD_MS = 620
 const FLIP_MS = 475
 const STEP_MS = HOLD_MS + FLIP_MS
 const TOTAL_MS = HOLD_MS * COLORS.length + FLIP_MS * (COLORS.length - 1)
+const FADE_MS = 600
+
+// Ceiling on the asset wait. window.load blocks on every byte of media, so a
+// slow connection or one stalled request could otherwise leave assetsReady
+// false forever.
+const MAX_ASSET_WAIT_MS = 4000
 
 export default function LoadingScreen({ onLoadComplete }) {
   const [colorIndex, setColorIndex] = useState(0)
@@ -40,7 +46,8 @@ export default function LoadingScreen({ onLoadComplete }) {
     return () => timers.forEach(clearTimeout)
   }, [])
 
-  // Critical assets: fonts + DOM. Heavy media is excluded by design.
+  // Critical assets: fonts + DOM. window.load does wait on heavy media, so the
+  // race below caps how long that can hold the loader open.
   useEffect(() => {
     let cancelled = false
 
@@ -54,7 +61,10 @@ export default function LoadingScreen({ onLoadComplete }) {
       ? document.fonts.ready.catch(() => {})
       : Promise.resolve()
 
-    Promise.all([domReady, fontsReady]).then(() => {
+    Promise.race([
+      Promise.all([domReady, fontsReady]),
+      new Promise(resolve => setTimeout(resolve, MAX_ASSET_WAIT_MS)),
+    ]).then(() => {
       if (!cancelled) setAssetsReady(true)
     })
 
@@ -64,6 +74,21 @@ export default function LoadingScreen({ onLoadComplete }) {
   }, [])
 
   const shouldExit = minTimeDone && assetsReady
+
+  // Hand off on a timer rather than from framer-motion's onAnimationComplete:
+  // rAF-driven animations don't progress in a background tab, so relying on the
+  // fade to complete left the loader up indefinitely for anyone who opened the
+  // site in an unfocused tab. setTimeout is throttled there, but it still fires.
+  useEffect(() => {
+    if (!shouldExit || hasExited.current) return
+
+    const timer = setTimeout(() => {
+      hasExited.current = true
+      onLoadComplete()
+    }, FADE_MS)
+
+    return () => clearTimeout(timer)
+  }, [shouldExit, onLoadComplete])
   const { bg, logo } = COLORS[colorIndex]
   const logoSrc = `/assets/images/logo-${logo}.svg`
   // Odd steps land the face at 180°/540°, so counter-rotate the logo to keep
@@ -76,13 +101,7 @@ export default function LoadingScreen({ onLoadComplete }) {
       style={{ pointerEvents: shouldExit ? 'none' : 'auto' }}
       initial={{ opacity: 1 }}
       animate={{ opacity: shouldExit ? 0 : 1 }}
-      transition={{ duration: 0.6, ease: 'easeInOut' }}
-      onAnimationComplete={() => {
-        if (shouldExit && !hasExited.current) {
-          hasExited.current = true
-          onLoadComplete()
-        }
-      }}
+      transition={{ duration: FADE_MS / 1000, ease: 'easeInOut' }}
     >
       <div className="w-12 h-12" style={{ perspective: '150px' }}>
         <motion.div
