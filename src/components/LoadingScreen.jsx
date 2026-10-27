@@ -4,8 +4,6 @@ import { motion } from 'framer-motion'
 const COLORS = [
   { bg: '#AE2E24', logo: 'light' },
   { bg: '#FCA700', logo: 'dark' },
-  { bg: '#803FA5', logo: 'light' },
-  { bg: '#669DF1', logo: 'dark' },
   { bg: '#292A2E', logo: 'light' },
 ]
 
